@@ -1,0 +1,4 @@
+.discord-preview { border-radius: 10px; padding: 12px 14px; background: var(--surface-2); border: 1px solid var(--line); }
+.discord-preview-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+.discord-preview-row { display: flex; gap: 12px; align-items: center; }
+.discord-preview-logo { width: 54px; height: 54px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 24px; color: #fff; background: linear-gradient(135deg, #8790f6, #3c45a5); flex: none; }
