@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MessageCircle, ExternalLink, ShieldCheck, Activity } from 'lucide-react';
+import { MessageSquare, ExternalLink, ShieldCheck, Activity } from 'lucide-react';
 import { put, useApi, openExternal } from '@hostwerk/api';
 import { Btn, SettingRow, Switch, Callout, InfoTip, toast } from '@hostwerk/ui';
 import './style.css';
@@ -39,7 +39,7 @@ function DiscordPage() {
     <div className="page fade-in">
       <div className="page-head">
         <div>
-          <h1><MessageCircle /> Discord status</h1>
+          <h1><MessageSquare /> Discord status</h1>
           <p>Shows “Playing Hostwerk” in your Discord profile – even when Hostwerk only runs in the tray.</p>
         </div>
         <div className="actions">
@@ -64,7 +64,7 @@ function DiscordPage() {
           </div>
         </div>
         <div className="card">
-          <div className="card-head"><MessageCircle size={16} /><h3>How it looks</h3></div>
+          <div className="card-head"><MessageSquare size={16} /><h3>How it looks</h3></div>
           <div className="card-body"><Preview s={s} /></div>
         </div>
       </div>
