@@ -10,6 +10,7 @@ Zeigt „Spielt Hostwerk“ in deinem Discord-Profil – mit den Arten der laufe
 
 ## Was sie kann
 
+- **Wo:** Livebetrieb → Betrieb → Discord (ein Reiter zusammen mit „Discord-Steuerung“) – seit 1.2.0 ohne eigenen Seitenleisten-Eintrag; die ganze Seite bleibt unter Erweiterungen → Öffnen
 - Rich Presence mit den Arten der laufenden Dienste (Web, Datenbank, Minecraft …)
 - Zeigt nie Namen von Projekten oder Ordnern
 - Spricht direkt mit der Discord-App auf diesem PC – kein Internet nötig

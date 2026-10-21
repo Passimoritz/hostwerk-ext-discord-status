@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Lives where it belongs: Go live → Operate → Discord (one tab together with “Discord control”) – no own sidebar entry any more (Hostwerk 3.0+); the full page stays under Extensions → Open and can be pinned in the sidebar settings. / Steckt jetzt dort, wo sie hingehört: Livebetrieb → Betrieb → Discord (ein Reiter zusammen mit „Discord-Steuerung“) – kein eigener Seitenleisten-Eintrag mehr (Hostwerk 3.0+); die ganze Seite bleibt unter Erweiterungen → Öffnen und lässt sich in den Seitenleisten-Einstellungen anheften.
+
 ## 1.1.0
 
 - The preview shows the real status that others see – not an example. / Die Vorschau zeigt den echten Status, den andere sehen – kein Beispiel mehr.
