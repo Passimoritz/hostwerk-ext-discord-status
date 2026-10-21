@@ -2,7 +2,7 @@
 
 # Discord status
 
-Shows “Playing Hostwerk” in your Discord profile – with the kinds of services that run, never project or server names.
+Shows “Playing Hostwerk” in your Discord profile – with the kinds of services that run, never project names (a server name only if you switch it on).
 
 [Deutsch](README.de.md) · An official [Hostwerk](https://github.com/Passimoritz/hostwerk-public) extension (SDK 2.7, native extension)
 
@@ -11,9 +11,14 @@ Shows “Playing Hostwerk” in your Discord profile – with the kinds of servi
 ## What it does
 
 - Rich Presence with the kinds of running services (web, database, Minecraft …)
-- Never shows names of projects or servers
+- Never shows names of projects or folders
 - Talks directly to the Discord app on this PC – no internet needed
-- Own Discord app id possible
+- Preview of the real status, status dot in the sidebar
+- Optional: player count, Minecraft server name, one image per kind of service
+- Buttons under the status: “View status” (public status page) and one own button
+- Own Discord app id possible (“Use default” goes back)
+
+Images per kind: Discord only shows images that are uploaded to the Discord application (Hostwerk’s or your own) under the names `kind-web`, `kind-db`, `kind-mail`, `kind-app`, `kind-mc` and `kind-ai` (Rich Presence → Art Assets).
 
 ## Install
 

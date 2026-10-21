@@ -2,7 +2,7 @@
 
 # Discord-Status
 
-Zeigt „Spielt Hostwerk“ in deinem Discord-Profil – mit den Arten der laufenden Dienste, nie mit Projekt- oder Servernamen.
+Zeigt „Spielt Hostwerk“ in deinem Discord-Profil – mit den Arten der laufenden Dienste, nie mit Projektnamen (einen Servernamen nur, wenn du ihn einschaltest).
 
 [English](README.md) · Offizielle [Hostwerk](https://github.com/Passimoritz/hostwerk-public)-Erweiterung (SDK 2.7, native Erweiterung)
 
@@ -11,9 +11,14 @@ Zeigt „Spielt Hostwerk“ in deinem Discord-Profil – mit den Arten der laufe
 ## Was sie kann
 
 - Rich Presence mit den Arten der laufenden Dienste (Web, Datenbank, Minecraft …)
-- Zeigt nie Namen von Projekten oder Servern
+- Zeigt nie Namen von Projekten oder Ordnern
 - Spricht direkt mit der Discord-App auf diesem PC – kein Internet nötig
-- Eigene Discord-App-ID möglich
+- Vorschau des echten Status, Status-Punkt in der Seitenleiste
+- Auf Wunsch: Spielerzahl, Name des Minecraft-Servers, ein Bild je Dienstart
+- Knöpfe im Status: „Status ansehen“ (öffentliche Statusseite) und ein eigener Knopf
+- Eigene Discord-App-ID möglich („Standard verwenden“ kehrt zurück)
+
+Bilder je Dienstart: Discord zeigt nur Bilder, die in der Discord-Anwendung (der von Hostwerk oder deiner eigenen) unter den Namen `kind-web`, `kind-db`, `kind-mail`, `kind-app`, `kind-mc` und `kind-ai` hochgeladen sind (Rich Presence → Art Assets).
 
 ## Installieren
 

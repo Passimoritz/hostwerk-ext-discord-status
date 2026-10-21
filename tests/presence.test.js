@@ -101,6 +101,13 @@ test('Discord status end to end with a fake Discord', async () => {
   await d.connect(); await wait(400);
   assert.ok(d.status().connected, 'Discord open again → reconnected');
 
+  // Discord refuses (e.g. an invalid application id): error on the page, connection closed, retried later
+  client.write(encode(2, { code: 4000, message: 'Invalid Client ID' })); await wait(200);
+  assert.ok(!d.status().connected);
+  assert.strictEqual(d.status().error, 'Invalid Client ID');
+  await d.connect(); await wait(400);
+  assert.ok(d.status().connected && d.status().error === null, 'next connection clears the error');
+
   d.stop(); await wait(200);
   assert.strictEqual(last().msg.args.activity, null, 'cleared on shutdown');
   server.close();

@@ -34,7 +34,9 @@ jobs:
           cp ui/index.js "$RUNNER_TEMP/committed.js"
           node "$RUNNER_TEMP/build-native.js" .
           git diff --quiet -- ui/index.js || echo "::warning::ui/index.js differs from a fresh build – run the build before tagging."
+          git checkout -- ui/index.js ui/index.css 2>/dev/null || true
       - name: Unit tests
+        if: hashFiles('tests/*.test.js') != ''
         run: node --test tests/*.test.js
       - name: Build package
         if: startsWith(github.ref, 'refs/tags/v')
@@ -42,13 +44,15 @@ jobs:
           ID=$(node -p "require('./manifest.json').id")
           VER=$(node -p "require('./manifest.json').version")
           if [ "v$VER" != "$GITHUB_REF_NAME" ]; then echo "Tag $GITHUB_REF_NAME does not match manifest version $VER"; exit 1; fi
-          FILES="manifest.json"
-          for f in icon.svg icon.png banner.svg banner.png page widget locales server.js server ui/index.js ui/index.css docs CHANGELOG.md README.md README.de.md LICENSE browser-extension; do [ -e "$f" ] && FILES="$FILES $f"; done
-          zip -r -X "$ID-$VER.zip" $FILES -x 'docs/*.md'
+          # Everything that belongs to the package (pages, widget, server/, ui/, locales/, lang/, data/, docs/ …) –
+          # only the repository tooling stays out (Git, workflows, tests, interface source, installed build tools)
+          zip -r -X "$ID-$VER.zip" . -x ".git/*" ".github/*" "tests/*" "ui/src/*" "node_modules/*" "*.zip" "*.sha256" ".gitignore" "*.DS_Store" "docs/*.md"
           sha256sum "$ID-$VER.zip" | cut -d' ' -f1 > "$ID-$VER.zip.sha256"
           echo "Package: $ID-$VER.zip ($(cat "$ID-$VER.zip.sha256"))"
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" *.zip *.zip.sha256 --title "$GITHUB_REF_NAME" --notes-file CHANGELOG.md
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then gh release upload "$GITHUB_REF_NAME" *.zip *.zip.sha256 --clobber
+          else gh release create "$GITHUB_REF_NAME" *.zip *.zip.sha256 --title "$GITHUB_REF_NAME" --notes-file CHANGELOG.md; fi
