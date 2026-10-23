@@ -1,5 +1,9 @@
 /* hostwerk-allow: colors – the preview logo uses Discord's blurple like the real profile card */
 .discord-grid { align-items: start; }
+/* Die Vorschau klebt rechts neben den Einstellungen – jede Änderung bleibt sichtbar, ohne hoch und runter zu scrollen */
+.discord-preview-card { position: sticky; top: var(--sp-3); }
+.discord-more { margin-top: var(--sp-2); gap: var(--sp-1); }
+.discord-rot { transform: rotate(90deg); }
 .discord-preview { border-radius: var(--r-lg); padding: var(--sp-3) var(--sp-4); background: var(--surface-2); border: 1px solid var(--line); }
 .discord-preview-label { font-size: var(--fs-2xs); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: var(--sp-2); }
 .discord-preview-row { display: flex; gap: var(--sp-3); align-items: center; }

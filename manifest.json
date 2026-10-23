@@ -9,7 +9,7 @@
     "de": "Zeigt in deinem Discord-Profil „Spielt Hostwerk“ – mit den laufenden Dienstarten, nie mit Projekt- oder Servernamen. Verbindet sich direkt mit dem Discord auf diesem PC, ohne Internet.",
     "en": "Shows “Playing Hostwerk” in your Discord profile – with the kinds of services running, never project or server names. Talks directly to Discord on this PC, no internet needed."
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "Hostwerk",
   "homepage": "https://github.com/Passimoritz/hostwerk-ext-discord-status",
   "license": "MIT",

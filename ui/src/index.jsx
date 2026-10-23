@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MessageSquare, ExternalLink, ShieldCheck, Activity, RotateCw, CloudOff, MousePointerClick } from 'lucide-react';
+import { MessageSquare, ExternalLink, ShieldCheck, Activity, RotateCw, CloudOff, MousePointerClick, ChevronRight } from 'lucide-react';
 import { get, put, useApi, openExternal, on } from '@hostwerk/api';
 import { Btn, SettingRow, Switch, Callout, InfoTip, Loading, Empty, toast } from '@hostwerk/ui';
 import { t } from '@hostwerk/i18n';
@@ -64,6 +64,7 @@ function DiscordPage() {
   const { setData } = st;
   useEffect(() => { subs.add(setData); return () => { subs.delete(setData); }; }, [setData]);
   const [id, setId] = useState('');
+  const [more, setMore] = useState(false);
   if (!st.data && st.error) {
     return <div className="page"><Empty icon={CloudOff} title="Could not load the Discord status" text={st.error} action={<Btn icon={RotateCw} onClick={() => st.reload()}>Try again</Btn>} /></div>;
   }
@@ -97,11 +98,16 @@ function DiscordPage() {
             <SettingRow title="Show running services" text="Off = only “Hostwerk” with the uptime."><Switch checked={s.details !== false} disabled={off} onChange={(v) => save({ details: v })} /></SettingRow>
             <SettingRow title="Show player count" text="How many players are on your Minecraft servers."><Switch checked={s.players !== false} disabled={off || s.details === false} onChange={(v) => save({ players: v })} /></SettingRow>
             <SettingRow title="Show server name" text="Name of the Minecraft server with the most players – visible to everyone on Discord."><Switch checked={!!s.serverName} disabled={off || s.details === false} onChange={(v) => save({ serverName: v })} /></SettingRow>
-            <SettingRow title={<>One image per kind <InfoTip title="Images in Discord">Discord shows the image of the kind that runs most (web server, database, Minecraft …). The images have to be uploaded to the Discord application under the names kind-web, kind-db, kind-mail, kind-app, kind-mc and kind-ai (Rich Presence → Art Assets) – otherwise Discord shows none.</InfoTip></>} text="Large image for the main kind, small Hostwerk logo.">
-              <Switch checked={!!s.kindImages} disabled={off || s.details === false} onChange={(v) => save({ kindImages: v })} />
-            </SettingRow>
             <SettingRow title="Button “View status”" text={s.statusLink ? 'Links to your public status page.' : 'Needs the public status page (Live → Status page) and remote access.'}>
               <Switch checked={!!s.statusButton} disabled={off} onChange={(v) => save({ statusButton: v })} />
+            </SettingRow>
+            {/* Selten gebraucht: eigener Knopf und eigene Discord-Anwendung – zugeklappt, damit die Vorschau im Bild bleibt */}
+            <button type="button" className="btn ghost sm discord-more" aria-expanded={more} aria-controls="discord-more" onClick={() => setMore(!more)}>
+              <ChevronRight size={14} className={more ? 'discord-rot' : ''} aria-hidden="true" />{t('Images, own button and application')}
+            </button>
+            {more && <div id="discord-more">
+            <SettingRow title={<>One image per kind <InfoTip title="Images in Discord">Discord shows the image of the kind that runs most (web server, database, Minecraft …). The images have to be uploaded to the Discord application under the names kind-web, kind-db, kind-mail, kind-app, kind-mc and kind-ai (Rich Presence → Art Assets) – otherwise Discord shows none.</InfoTip></>} text="Large image for the main kind, small Hostwerk logo.">
+              <Switch checked={!!s.kindImages} disabled={off || s.details === false} onChange={(v) => save({ kindImages: v })} />
             </SettingRow>
             <OwnButton s={s} save={save} />
             <SettingRow title="Discord application id" text={s.ownClientId ? 'Your own application.' : 'Hostwerk’s application is used.'}>
@@ -112,9 +118,10 @@ function DiscordPage() {
               </div>
             </SettingRow>
             <Btn className="sm ghost discord-portal" icon={ExternalLink} onClick={() => openExternal('https://discord.com/developers/applications')}>Open the Discord developer portal</Btn>
+            </div>}
           </div>
         </div>
-        <div className="card">
+        <div className="card discord-preview-card">
           <div className="card-head"><MousePointerClick size={16} /><h3>How it looks</h3></div>
           <div className="card-body"><Preview s={s} /></div>
         </div>

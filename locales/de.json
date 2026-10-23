@@ -71,6 +71,7 @@
   "A button needs a label and a web address (https://…).": "Ein Knopf braucht eine Beschriftung und eine Webadresse (https://…).",
   "Discord shows the image of the kind that runs most (web server, database, Minecraft …). The images have to be uploaded to the Discord application under the names kind-web, kind-db, kind-mail, kind-app, kind-mc and kind-ai (Rich Presence → Art Assets) – otherwise Discord shows none.": "Discord zeigt das Bild der Dienstart, die am häufigsten läuft (Webserver, Datenbank, Minecraft …). Die Bilder müssen in der Discord-Anwendung unter den Namen kind-web, kind-db, kind-mail, kind-app, kind-mc und kind-ai hochgeladen sein (Rich Presence → Art Assets) – sonst zeigt Discord keins.",
   "Discord": "Discord",
+  "Images, own button and application": "Bilder, eigener Knopf und eigene Anwendung",
   "$patterns": [
     [
       "Connected as {} – your status is shown",

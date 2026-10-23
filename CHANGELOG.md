@@ -1,3 +1,7 @@
+## 1.2.1
+
+- The preview sticks next to the settings while you change them; images per kind, own button and own application are folded into one section / Die Vorschau klebt neben den Einstellungen, während du sie änderst; Bilder je Art, eigener Knopf und eigene Anwendung sind in einen Abschnitt eingeklappt
+
 ## 1.2.0
 
 - Lives where it belongs: Go live → Operate → Discord (one tab together with “Discord control”) – no own sidebar entry any more (Hostwerk 3.0+); the full page stays under Extensions → Open and can be pinned in the sidebar settings. / Steckt jetzt dort, wo sie hingehört: Livebetrieb → Betrieb → Discord (ein Reiter zusammen mit „Discord-Steuerung“) – kein eigener Seitenleisten-Eintrag mehr (Hostwerk 3.0+); die ganze Seite bleibt unter Erweiterungen → Öffnen und lässt sich in den Seitenleisten-Einstellungen anheften.
