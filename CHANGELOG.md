@@ -1,3 +1,7 @@
+## 1.2.2
+
+- New animated icon and banner in the common Hostwerk style (isometric block). / Neues animiertes Symbol und Banner im gemeinsamen Hostwerk-Stil (isometrischer Block).
+
 ## 1.2.1
 
 - The preview sticks next to the settings while you change them; images per kind, own button and own application are folded into one section / Die Vorschau klebt neben den Einstellungen, während du sie änderst; Bilder je Art, eigener Knopf und eigene Anwendung sind in einen Abschnitt eingeklappt
