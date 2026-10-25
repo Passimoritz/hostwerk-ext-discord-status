@@ -4,7 +4,7 @@
 
 Shows “Playing Hostwerk” in your Discord profile – with the kinds of services that run, never project names (a server name only if you switch it on).
 
-[Deutsch](README.de.md) · An official [Hostwerk](https://github.com/Passimoritz/hostwerk-public) extension (SDK 2.7, native extension)
+[Deutsch](README.de.md) · An official [Hostwerk](https://github.com/Passimoritz/hostwerk-public) extension (native extension, Hostwerk 2.9 or newer)
 
 ![Screenshot](docs/screenshot.png)
 
