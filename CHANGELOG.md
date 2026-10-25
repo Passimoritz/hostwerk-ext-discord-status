@@ -1,3 +1,9 @@
+# Changelog
+
+## 1.3.0
+
+- Own tab in Settings → Discord status instead of Go live → Operate (needs Hostwerk with SDK 3.8) – the status is part of your profile; Discord control (the bot) stays under Go live. / Eigener Reiter unter Einstellungen → Discord-Status statt Livebetrieb → Betrieb (braucht Hostwerk mit SDK 3.8) – der Status gehört zu deinem Profil; die Discord-Steuerung (Bot) bleibt im Livebetrieb.
+
 ## 1.2.2
 
 - New animated icon and banner in the common Hostwerk style (isometric block). / Neues animiertes Symbol und Banner im gemeinsamen Hostwerk-Stil (isometrischer Block).

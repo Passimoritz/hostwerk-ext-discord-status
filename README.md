@@ -10,7 +10,7 @@ Shows “Playing Hostwerk” in your Discord profile – with the kinds of servi
 
 ## What it does
 
-- **Where:** Go live → Operate → Discord (one tab together with “Discord control”) – no own sidebar entry since 1.2.0; the full page stays under Extensions → Open
+- **Where:** Settings → Discord status (own tab, since 1.3.0) – the status belongs to your profile, not to going live; Discord control (the bot) stays under Go live → Operate. The full page stays under Extensions → Open
 - Rich Presence with the kinds of running services (web, database, Minecraft …)
 - Never shows names of projects or folders
 - Talks directly to the Discord app on this PC – no internet needed

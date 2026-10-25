@@ -135,8 +135,9 @@ export default {
   slots: {
     // Seit Hostwerk 3.0 (SDK 3.2) ohne eigenen Seitenleisten-Eintrag ("nav": false) – die ganze Seite als Reiter im passenden Bereich;
     // Hostwerk blendet dabei ihren Titel aus (Reiter + Herkunftszeile sagen schon, was es ist), die Knöpfe bleiben
-    // Ein gemeinsamer Reiter „Discord“ mit dem Discord-Bot (gleiche id) – Livebetrieb → Betrieb
-    'live.tabs': [{ id: 'discord', title: 'Discord', icon: MessageSquare, Component: DiscordPage, group: 'betrieb', order: 60 }],
+    // Eigener Reiter in Hostwerks Einstellungen (SDK 3.8, Steckplatz settings.tabs): der Status gehört zu deinem Profil, nicht
+    // zum Livebetrieb – die Discord-Steuerung (Bot) bleibt unter Livebetrieb → Betrieb
+    'settings.tabs': [{ id: 'discord-status', title: 'Discord status', icon: MessageSquare, Component: DiscordPage, order: 60 }],
   },
   // Sidebar: green dot while Discord shows the status, grey when off or Discord is closed, red on an error
   nav: {
