@@ -98,7 +98,7 @@ function DiscordPage() {
             <SettingRow title="Show running services" text="Off = only “Hostwerk” with the uptime."><Switch checked={s.details !== false} disabled={off} onChange={(v) => save({ details: v })} /></SettingRow>
             <SettingRow title="Show player count" text="How many players are on your Minecraft servers."><Switch checked={s.players !== false} disabled={off || s.details === false} onChange={(v) => save({ players: v })} /></SettingRow>
             <SettingRow title="Show server name" text="Name of the Minecraft server with the most players – visible to everyone on Discord."><Switch checked={!!s.serverName} disabled={off || s.details === false} onChange={(v) => save({ serverName: v })} /></SettingRow>
-            <SettingRow title="Button “View status”" text={s.statusLink ? 'Links to your public status page.' : 'Needs the public status page (Live → Status page) and remote access.'}>
+            <SettingRow title="Button “View status”" text={s.statusLink ? 'Links to your public status page.' : 'Needs the public status page (Go live → Monitoring → Status page) and remote access.'}>
               <Switch checked={!!s.statusButton} disabled={off} onChange={(v) => save({ statusButton: v })} />
             </SettingRow>
             {/* Selten gebraucht: eigener Knopf und eigene Discord-Anwendung – zugeklappt, damit die Vorschau im Bild bleibt */}
@@ -136,7 +136,7 @@ export default {
     // Seit Hostwerk 3.0 (SDK 3.2) ohne eigenen Seitenleisten-Eintrag ("nav": false) – die ganze Seite als Reiter im passenden Bereich;
     // Hostwerk blendet dabei ihren Titel aus (Reiter + Herkunftszeile sagen schon, was es ist), die Knöpfe bleiben
     // Eigener Reiter in Hostwerks Einstellungen (SDK 3.8, Steckplatz settings.tabs): der Status gehört zu deinem Profil, nicht
-    // zum Livebetrieb – die Discord-Steuerung (Bot) bleibt unter Livebetrieb → Betrieb
+    // zum Livebetrieb – die Discord-Steuerung (Bot) bleibt unter Livebetrieb → Überwachung → Discord
     'settings.tabs': [{ id: 'discord-status', title: 'Discord status', icon: MessageSquare, Component: DiscordPage, order: 60 }],
   },
   // Sidebar: green dot while Discord shows the status, grey when off or Discord is closed, red on an error

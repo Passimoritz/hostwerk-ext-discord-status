@@ -24,7 +24,7 @@ function activate(host) {
     desktop: host.core('platform').HAS_DESKTOP,
     // Opt-in server name: only name and player limit of the server, nothing else
     mcInfo: (id) => { try { const m = ctx.minecraft && ctx.minecraft.list().find((x) => x.id === id); return m ? { name: m.name, maxPlayers: ctx.minecraft.info(m).maxPlayers || null } : null; } catch { return null; } },
-    // Button "View status": only the public link of the status page (Live → Status page), never the local one
+    // Button "View status": only the public link of the status page (Go live → Monitoring → Status page), never the local one
     statusLink: () => { try { const p = ctx.statusPage; if (!p || !p.cfg.on) return null; const l = p.links(); return (l.public && l.public[0]) || null; } catch { return null; } },
     notify: (status) => host.broadcast({ type: 'discord-status', status }),
   });

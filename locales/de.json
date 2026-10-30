@@ -59,7 +59,7 @@
   "Large image for the main kind, small Hostwerk logo.": "Großes Bild für die Hauptart, kleines Hostwerk-Logo.",
   "Button “View status”": "Knopf „Status ansehen“",
   "Links to your public status page.": "Führt zu deiner öffentlichen Statusseite.",
-  "Needs the public status page (Live → Status page) and remote access.": "Braucht die öffentliche Statusseite (Livebetrieb → Statusseite) und den Fernzugriff.",
+  "Needs the public status page (Go live → Monitoring → Status page) and remote access.": "Braucht die öffentliche Statusseite (Livebetrieb → Überwachung → Statusseite) und den Fernzugriff.",
   "View status": "Status ansehen",
   "Hostwerk’s application is used.": "Die Anwendung von Hostwerk wird benutzt.",
   "Use default": "Standard verwenden",
