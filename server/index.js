@@ -3,6 +3,7 @@
  * Native part of the Discord status extension: runs inside Hostwerk (SDK 2.7, see the guide "Native extensions").
  *   GET /api/discord            → connection state
  *   PUT /api/discord/settings   → { enabled, details, players, serverName, kindImages, statusButton, button, clientId }
+ *   POST /api/discord/resend    → send the current status again (after Discord refused it)
  * Changes reach the interface as the event { type: 'discord-status', status } (page and sidebar dot, no polling).
  */
 const { DiscordPresence } = require('./presence');
@@ -33,6 +34,7 @@ function activate(host) {
   host.router.put('/discord/settings', (req, res) => {
     try { res.json(presence.save(req.body || {})); } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
   });
+  host.router.post('/discord/resend', (req, res) => res.json(presence.resend()));
   host.on('shutdown', () => presence.stop());
   presence.start();
 }

@@ -22,6 +22,7 @@
   "Discord is not running – Hostwerk connects as soon as Discord is open": "Discord läuft nicht – Hostwerk verbindet sich, sobald Discord geöffnet ist",
   "Connected": "Verbunden",
   "Not connected": "Nicht verbunden",
+  "Status refused": "Status abgelehnt",
   "Your own application.": "Deine eigene Anwendung.",
   "Saved": "Gespeichert",
   "Discord refused the connection": "Discord hat die Verbindung abgelehnt",
@@ -80,6 +81,16 @@
     [
       "Error: {}",
       "Fehler: {}"
+    ],
+    [
+      "Connected – but Discord did not accept the status: {}",
+      "Verbunden – aber Discord hat den Status nicht angenommen: {}"
     ]
-  ]
+  ],
+  "Send again": "Erneut senden",
+  "Sent again": "Erneut gesendet",
+  "Last sent {n} second ago": "Zuletzt gesendet vor {n} Sekunde",
+  "Last sent {n} seconds ago": "Zuletzt gesendet vor {n} Sekunden",
+  "Last sent {n} minute ago": "Zuletzt gesendet vor {n} Minute",
+  "Last sent {n} minutes ago": "Zuletzt gesendet vor {n} Minuten"
 }

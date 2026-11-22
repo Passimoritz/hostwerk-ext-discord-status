@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { MessageSquare, ExternalLink, ShieldCheck, Activity, RotateCw, CloudOff, MousePointerClick, ChevronRight } from 'lucide-react';
-import { get, put, useApi, openExternal, on } from '@hostwerk/api';
+import { get, put, post, useApi, openExternal, on } from '@hostwerk/api';
 import { Btn, SettingRow, Switch, Callout, InfoTip, Loading, Empty, toast } from '@hostwerk/ui';
-import { t } from '@hostwerk/i18n';
+import { t, pl } from '@hostwerk/i18n';
 import './style.css';
 
 /*
@@ -17,6 +17,15 @@ const subs = new Set();
 const remember = (s) => { if (s && typeof s === 'object') { last = s; subs.forEach((f) => f(s)); } };
 on('discord-status', (m) => remember(m && m.status));
 get('/discord').then(remember).catch(() => { /* shown on the page */ });
+
+/** "last sent 12 s ago" under the preview – Discord itself shows changes only every few seconds. */
+function SentAgo({ at }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { if (!at) return undefined; const h = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(h); }, [at]);
+  if (!at) return null;
+  const s = Math.max(0, Math.round((now - at) / 1000));
+  return <p className="tiny muted discord-sent">{s < 60 ? pl(s, 'Last sent {n} second ago', 'Last sent {n} seconds ago') : pl(Math.floor(s / 60), 'Last sent {n} minute ago', 'Last sent {n} minutes ago')}</p>;
+}
 
 function Preview({ s }) {
   // Small look-alike of the Discord profile card with the real status that others see right now
@@ -35,17 +44,21 @@ function Preview({ s }) {
           {images && <div className="tiny muted">{t('Image: {name}', { name: p.assets.large_text })}</div>}
         </div>
       </div>
-      {(p.buttons || []).map((b) => <div key={b.url} className="discord-preview-btn">{b.label}</div>)}
+      {(p.buttons || []).map((b, i) => <div key={i} className="discord-preview-btn">{b.label}</div>)}
+      {s.connected && <SentAgo at={s.sentAt} />}
     </div>
   );
 }
+
+const validUrl = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) && (/\.([a-z]{2,}|xn--[a-z0-9-]+)$/i.test(x.hostname) || /^\d{1,3}(\.\d{1,3}){3}$/.test(x.hostname)); } catch { return false; } };
 
 /** One own button under the status (label + web address). */
 function OwnButton({ s, save }) {
   const [label, setLabel] = useState('');
   const [url, setUrl] = useState('');
   useEffect(() => { setLabel((s.button && s.button.label) || ''); setUrl((s.button && s.button.url) || ''); }, [s.button && s.button.label, s.button && s.button.url]); // eslint-disable-line react-hooks/exhaustive-deps
-  const ok = label.trim() && /^https?:\/\/[^\s/]+/i.test(url.trim());
+  // Like the server: a real host with a domain ending (or an IPv4 address) – "https://a" is refused
+  const ok = label.trim() && validUrl(url.trim()) && /^https?:\/\/[^\s/]+/i.test(url.trim());
   return (
     <SettingRow title="Own button" text="For example “Join the server” with a link to your website or Discord server.">
       <div className="discord-button-form">
@@ -70,11 +83,13 @@ function DiscordPage() {
   }
   if (!st.data) return <div className="page"><Loading /></div>;
   const s = st.data;
-  const save = async (patch, done) => { try { const r = await put('/discord/settings', patch); setData(r); remember(r); if (done) toast.success(done); } catch (e) { toast.error(e); } };
+  const save = async (patch, done) => { try { const r = await put('/discord/settings', patch); setData(r); remember(r); if (done) toast.success(done); return true; } catch (e) { toast.error(e); return false; } };
+  // Connected but the status was refused (e.g. too short a server name) – otherwise "your status is shown" would be wrong
   const line = s.enabled === false ? 'Off'
     : !s.hasClientId ? 'Application id missing'
-      : s.connected ? (s.user ? `Connected as ${s.user} – your status is shown` : 'Connected – your status is shown')
-        : s.error ? `Error: ${s.error}` : 'Discord is not running – Hostwerk connects as soon as Discord is open';
+      : s.connected && s.error ? `Connected – but Discord did not accept the status: ${s.error}`
+        : s.connected ? (s.user ? `Connected as ${s.user} – your status is shown` : 'Connected – your status is shown')
+          : s.error ? `Error: ${s.error}` : 'Discord is not running – Hostwerk connects as soon as Discord is open';
   const on2 = s.connected && s.enabled !== false;
   const off = s.enabled === false;
   return (
@@ -85,7 +100,8 @@ function DiscordPage() {
           <p>Shows “Playing Hostwerk” in your Discord profile – even when Hostwerk only runs in the tray.</p>
         </div>
         <div className="actions">
-          <span className={`badge ${on2 ? 'ok' : ''}`}>{on2 ? 'Connected' : 'Not connected'}</span>
+          {/* Same states as the sidebar dot: a refused status is not a green "Connected" */}
+          <span className={`badge ${off ? '' : on2 && s.error ? 'warn' : on2 ? 'ok' : ''}`}>{off ? 'Off' : on2 && s.error ? 'Status refused' : on2 ? 'Connected' : 'Not connected'}</span>
           <InfoTip title="What is shared?" icon={ShieldCheck}>Only kinds of services (for example web server · database) and how many are running. Never project or folder names – a server name only if you switch it on.</InfoTip>
         </div>
       </div>
@@ -95,6 +111,8 @@ function DiscordPage() {
           <div className="card-head"><Activity size={16} /><h3>Settings</h3></div>
           <div className="card-body">
             <SettingRow title="Share status in Discord" text={line}><Switch checked={!off} onChange={(v) => save({ enabled: v })} /></SettingRow>
+            {/* Refused (e.g. briefly rate-limited or after fixing the cause): send the same status again without flipping a switch */}
+            {on2 && s.error && <div className="discord-resend"><Btn className="sm" icon={RotateCw} onClick={async () => { try { const r = await post('/discord/resend'); setData(r); remember(r); toast.success('Sent again'); } catch (e) { toast.error(e); } }}>Send again</Btn></div>}
             <SettingRow title="Show running services" text="Off = only “Hostwerk” with the uptime."><Switch checked={s.details !== false} disabled={off} onChange={(v) => save({ details: v })} /></SettingRow>
             <SettingRow title="Show player count" text="How many players are on your Minecraft servers."><Switch checked={s.players !== false} disabled={off || s.details === false} onChange={(v) => save({ players: v })} /></SettingRow>
             <SettingRow title="Show server name" text="Name of the Minecraft server with the most players – visible to everyone on Discord."><Switch checked={!!s.serverName} disabled={off || s.details === false} onChange={(v) => save({ serverName: v })} /></SettingRow>
@@ -111,9 +129,9 @@ function DiscordPage() {
             </SettingRow>
             <OwnButton s={s} save={save} />
             <SettingRow title="Discord application id" text={s.ownClientId ? 'Your own application.' : 'Hostwerk’s application is used.'}>
-              <div className="row-tight">
-                <input className="input sm discord-id" inputMode="numeric" placeholder="e.g. 1234567890123456789" aria-label="Discord application id" value={id} onChange={(e) => setId(e.target.value.replace(/\D/g, ''))} />
-                <Btn className="sm" disabled={!/^\d{15,22}$/.test(id)} onClick={() => save({ clientId: id }, 'Saved').then(() => setId(''))}>Save</Btn>
+              <div className="row-tight discord-id-row">
+                <input className="input sm discord-id" inputMode="numeric" placeholder="1234567890…" aria-label="Discord application id" value={id} onChange={(e) => setId(e.target.value.replace(/\D/g, ''))} />
+                <Btn className="sm" disabled={!/^\d{15,22}$/.test(id)} onClick={() => save({ clientId: id }, 'Saved').then((done) => { if (done) setId(''); })}>Save</Btn>
                 {s.ownClientId && <Btn className="sm ghost" onClick={() => save({ clientId: '' }, 'Hostwerk’s application is used again')}>Use default</Btn>}
               </div>
             </SettingRow>
@@ -144,8 +162,8 @@ export default {
     tip: () => {
       const s = last;
       if (!s) return null;
-      const state = s.enabled === false ? 'stopped' : s.connected ? 'running' : s.error ? 'error' : 'stopped';
-      const text = s.enabled === false ? t('Off') : s.connected ? (s.user ? t('Connected as {user}', { user: s.user }) : t('Connected')) : s.error ? t('Error: {error}', { error: s.error }) : t('Discord is not running');
+      const state = s.enabled === false ? 'stopped' : s.error ? 'error' : s.connected ? 'running' : 'stopped';
+      const text = s.enabled === false ? t('Off') : s.connected && !s.error ? (s.user ? t('Connected as {user}', { user: s.user }) : t('Connected')) : s.error ? t('Error: {error}', { error: s.error }) : t('Discord is not running');
       return { text: t('Shows “Playing Hostwerk” in your Discord profile.'), lines: [{ name: 'Discord', state, text }] };
     },
   },

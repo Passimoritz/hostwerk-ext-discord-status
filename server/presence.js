@@ -46,12 +46,15 @@ const KIND_IMAGES = { web: 'kind-web', db: 'kind-db', mail: 'kind-mail', app: 'k
 
 // Buttons under the status: Discord allows two, label up to 32 characters, only web addresses
 const BUTTON_LABEL_MAX = 32;
-const isWebUrl = (u) => { try { const x = new URL(String(u)); return (x.protocol === 'https:' || x.protocol === 'http:') && !!x.hostname; } catch { return false; } };
+// … with a real host: a domain ending (example.com) or an IPv4 address – Discord may refuse "https://a" or "http://localhost"
+const isWebUrl = (u) => { try { const x = new URL(String(u)); return (x.protocol === 'https:' || x.protocol === 'http:') && (/\.([a-z]{2,}|xn--[a-z0-9-]+)$/i.test(x.hostname) || /^\d{1,3}(\.\d{1,3}){3}$/.test(x.hostname)); } catch { return false; } };
+// Shorten without cutting an emoji (surrogate pair) in half – Discord rejects broken text
+const cut = (s, n) => { const x = String(s).slice(0, n); return /[\uD800-\uDBFF]$/.test(x) ? x.slice(0, -1) : x; };
 
 /** Clean up a button from the settings (or null if it is not usable). */
 function cleanButton(b) {
   if (!b || typeof b !== 'object') return null;
-  const label = String(b.label || '').trim().slice(0, BUTTON_LABEL_MAX);
+  const label = cut(String(b.label || '').trim(), BUTTON_LABEL_MAX).trim();
   const url = String(b.url || '').trim();
   return label && isWebUrl(url) && url.length <= 512 ? { label, url } : null;
 }
@@ -123,7 +126,7 @@ class DiscordPresence {
     try { preview = c.enabled ? this.activity() : null; } catch { preview = null; }
     return {
       enabled: c.enabled, details: c.details, players: c.players, serverName: c.serverName, kindImages: c.kindImages, statusButton: c.statusButton, button: c.button,
-      hasClientId: !!c.clientId, ownClientId: c.clientId !== DEFAULT_CLIENT_ID, connected: this.ready, user: this.user, error: this.lastError,
+      hasClientId: !!c.clientId, ownClientId: c.clientId !== DEFAULT_CLIENT_ID, connected: this.ready, user: this.user, error: this.lastError, sentAt: this.sentAt || null,
       desktop: this.d.desktop !== false, statusLink: !!(this.d.statusLink && this.d.statusLink()), preview,
     };
   }
@@ -207,8 +210,9 @@ class DiscordPresence {
         this.onMessage(op, msg);
       }
     });
-    const gone = () => { if (this.sock === sock) { this.sock = null; this.ready = false; this.user = null; this.lastSent = ''; this.notify(); } };
-    sock.on('error', (e) => { this.lastError = e.message; gone(); });
+    // Discord was closed (or crashed): that is "not running", not an error – an old error would otherwise stay red
+    const gone = () => { if (this.sock === sock) { this.sock = null; this.ready = false; this.user = null; this.lastSent = ''; this.lastError = null; this.notify(); } };
+    sock.on('error', gone);
     sock.on('close', gone);
     sock.write(encode(OP.HANDSHAKE, { v: 1, client_id: clientId }));
   }
@@ -231,6 +235,11 @@ class DiscordPresence {
       this.notify();
     } else if (msg.evt === 'ERROR') {
       this.lastError = (msg.data && msg.data.message) || this.d.t('Discord error');
+      this.lastSent = ''; // refused: the same status may be sent again (next change or "Send again")
+      this.notify();
+    } else if (msg.cmd === 'SET_ACTIVITY' && this.lastError) {
+      // Discord accepted the status again – the old refusal is over
+      this.lastError = null;
       this.notify();
     }
   }
@@ -241,10 +250,12 @@ class DiscordPresence {
     if (s) { try { s.end(encode(OP.CLOSE, {})); } catch { /* ignore */ } s.destroy(); }
   }
 
-  // Discord allows only a few updates per minute → bundle them
+  // Discord allows only a few updates per minute → bundle them. A pending update is not pushed back again,
+  // otherwise status events every few seconds (player counts, stats) would postpone it forever.
   schedule(ms = 3000) {
+    if (this.timer && ms > 0) return;
     clearTimeout(this.timer);
-    this.timer = setTimeout(() => this.update(), ms);
+    this.timer = setTimeout(() => { this.timer = null; this.update(); }, ms);
     if (this.timer.unref) this.timer.unref();
   }
 
@@ -286,7 +297,9 @@ class DiscordPresence {
       const parts = [];
       // Opt-in: name of the Minecraft server with the most players – the only name that ever leaves this PC
       const info = c.serverName && top && this.d.mcInfo ? this.d.mcInfo(top.id) : null;
-      if (info && info.name) parts.push(String(info.name).slice(0, 60));
+      // Discord needs at least 2 characters – a blank or one-letter name falls back to the count
+      const name = info && info.name ? cut(String(info.name).replace(/\s+/g, ' ').trim(), 60).trim() : '';
+      if (name.length >= 2) parts.push(name);
       else if (total) parts.push(t(total === 1 ? '{n} service running' : '{n} services running', { n: total }));
       if (c.players && players) parts.push(t(players === 1 ? '{n} player online' : '{n} players online', { n: players }));
       act.state = parts.length ? parts.join(' · ') : t('Local development server');
@@ -308,6 +321,16 @@ class DiscordPresence {
   send(activity) {
     if (!this.sock || !this.ready) return;
     this.sock.write(encode(OP.FRAME, { cmd: 'SET_ACTIVITY', args: { pid: process.pid, activity }, nonce: String(++this.nonce) }));
+    this.sentAt = activity ? Date.now() : null; // the page shows "last sent … ago" (Discord itself updates only every few seconds)
+    this.notify();
+  }
+
+  /** "Send again" after a refusal: send the current status now, even if it did not change. */
+  resend() {
+    this.lastSent = '';
+    clearTimeout(this.timer); this.timer = null;
+    this.update();
+    return this.status();
   }
 
   update() {

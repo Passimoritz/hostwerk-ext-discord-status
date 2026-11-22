@@ -52,8 +52,9 @@ test('Discord status end to end with a fake Discord', async () => {
   const t = (s, v) => fill(S.general.language === 'de' && de[s] ? de[s] : s, v);
   const d = new DiscordPresence({ settings, registry, bus, webIds: () => ['apache'], dbIds: () => ['mariadb'], version: () => '9.9.9', t, desktop: true });
   d.start();
-  await wait(400);
   const last = () => [...frames].reverse().find((f) => f.msg.cmd === 'SET_ACTIVITY');
+  // Wait for the first status instead of a fixed time – a busy PC can take longer than 400 ms
+  for (let i = 0; i < 50 && !last(); i++) await wait(100);
 
   assert.strictEqual(frames[0].op, 0, 'handshake first');
   assert.strictEqual(frames[0].msg.client_id, '123456789012345678');

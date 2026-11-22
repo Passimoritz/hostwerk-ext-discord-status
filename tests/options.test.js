@@ -101,3 +101,50 @@ test('interface events only when something visible changed', () => {
   d.save({ enabled: false });
   assert.strictEqual(sent[sent.length - 1].preview, null, 'off → nothing to preview');
 });
+
+test('server name: blank or one-letter names fall back to the count, emojis are never cut in half', () => {
+  for (const name of ['A', ' ', '  \n ', '']) {
+    const a = make({ serverName: true, players: false }, { mcInfo: () => ({ name, maxPlayers: 20 }) }).d.activity();
+    assert.strictEqual(a.state, '3 services running', JSON.stringify(name));
+  }
+  const s = make({ serverName: true, players: false }, { mcInfo: () => ({ name: `  x${'🎮'.repeat(40)}  `, maxPlayers: 20 }) }).d.activity().state;
+  assert.ok(s.length <= 60 && !/[\uD800-\uDBFF]$/.test(s), s);
+  assert.ok(!/[\uD800-\uDBFF]$/.test(cleanButton({ label: `x${'🎮'.repeat(20)}`, url: 'https://x.example' }).label));
+});
+
+test('a refused status is shown while connected and goes away once Discord accepts one', () => {
+  const { d } = make();
+  d.ready = true; d.sock = { write() {} };
+  d.onMessage(1, { cmd: 'SET_ACTIVITY', evt: 'ERROR', data: { message: 'child "activity" fails' } });
+  assert.ok(d.status().connected && d.status().error === 'child "activity" fails');
+  d.onMessage(1, { cmd: 'SET_ACTIVITY', evt: null, data: {} });
+  assert.strictEqual(d.status().error, null);
+});
+
+test('a steady stream of status events does not postpone the update forever', async () => {
+  const { d } = make();
+  let updates = 0;
+  d.update = () => { updates++; };
+  const t0 = Date.now();
+  while (Date.now() - t0 < 4000) { d.schedule(); await new Promise((r) => setTimeout(r, 500)); }
+  assert.ok(updates >= 1, 'update ran during the stream');
+  d.schedule(0); await new Promise((r) => setTimeout(r, 20));
+  assert.ok(updates >= 2, 'an immediate update still goes through');
+  clearTimeout(d.timer);
+});
+
+test('button addresses need a real host; a refused status can be sent again; the time of the last send is known', () => {
+  for (const url of ['https://a', 'http://localhost', 'https://x.']) assert.strictEqual(cleanButton({ label: 'Go', url }), null, url);
+  for (const url of ['https://example.com', 'http://203.0.113.5/x', 'https://xn--mller-kva.de']) assert.ok(cleanButton({ label: 'Go', url }), url);
+  const { d } = make();
+  const sent = [];
+  d.ready = true; d.sock = { write: (b) => sent.push(b) };
+  d.update();
+  const n = sent.length;
+  assert.ok(n >= 1 && d.status().sentAt > 0, 'sent with time');
+  d.update();
+  assert.strictEqual(sent.length, n, 'same status is not sent twice');
+  d.onMessage(1, { cmd: 'SET_ACTIVITY', evt: 'ERROR', data: { message: 'rate limited' } });
+  d.resend();
+  assert.strictEqual(sent.length, n + 1, '"Send again" sends the same status once more');
+});
