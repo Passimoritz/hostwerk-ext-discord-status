@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0
+
+- When Discord refuses the status, the page now says so (“Status refused” instead of a green “Connected”) and offers “Send again”; below the preview you see when the status was last sent. / Lehnt Discord den Status ab, sagt die Seite das jetzt („Status abgelehnt“ statt grünem „Verbunden“) und bietet „Erneut senden“ an; unter der Vorschau steht, wann der Status zuletzt gesendet wurde.
+- Fixes: frequent status changes no longer postpone the update forever, an old error disappears when Discord is closed, emojis are never cut in half, too short server names and button addresses without a real domain are no longer sent. / Behoben: Häufige Statusänderungen schieben die Aktualisierung nicht mehr endlos auf, ein alter Fehler verschwindet, wenn Discord geschlossen wird, Emojis werden nie halbiert, zu kurze Servernamen und Knopf-Adressen ohne echte Domain werden nicht mehr gesendet.
+- Fits narrow windows (1024 px): long buttons, the application ID row and long names wrap instead of running out of the card; places in Hostwerk named after the new menus. / Passt in schmale Fenster (1024 px): Lange Knöpfe, die Zeile für die Anwendungs-ID und lange Namen brechen um, statt aus der Karte zu laufen; Orte in Hostwerk nach den neuen Menüs benannt.
+
 ## 1.3.0
 
 - Own tab in Settings → Discord status instead of Go live → Operate (needs Hostwerk with SDK 3.8) – the status is part of your profile; Discord control (the bot) stays under Go live. / Eigener Reiter unter Einstellungen → Discord-Status statt Livebetrieb → Betrieb (braucht Hostwerk mit SDK 3.8) – der Status gehört zu deinem Profil; die Discord-Steuerung (Bot) bleibt im Livebetrieb.
